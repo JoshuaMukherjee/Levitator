@@ -27,6 +27,7 @@ class Levitator {
 
 public:
 	AsierInho_V2::AsierInhoBoard_V2* driver;
+	AsierInho::AsierInhoBoard* disc;
 	Levitator( int* boardIDsIn, float* matBoardToWorldIn, int numBoardsIn = 2,bool printIn=true);
 	//Levitator();
 	int setPhaseAmplitude(float* phases, float* amplitudes = NULL, float relative_amp = 1.0);

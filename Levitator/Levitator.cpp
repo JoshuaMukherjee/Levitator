@@ -36,6 +36,10 @@ int Levitator::init_driver() {
 	driver->readParameters(transducerPositions, transducerNormals, mappings, phaseDelays, amplitudeAdjust, &numDiscreteLevels);
 
 
+	disc = AsierInho::createAsierInho(); //MOVE THIS TO INIT
+	disc->connect(AsierInho::BensDesign, boardIDs[0], boardIDs[1]);
+	disc->disconnect();
+
 	return 0;
 }
 
@@ -84,9 +88,7 @@ int Levitator::setPhaseAmplitude(float* phases, float* amplitudes, float relativ
 
 	
 
-	AsierInho::AsierInhoBoard* disc = AsierInho::createAsierInho(); //MOVE THIS TO INIT
-	disc->connect(AsierInho::BensDesign, boardIDs[0], boardIDs[1]);
-	disc->disconnect();
+	
 
 	disc->discretizePhases(phases, phases_disc);
 
