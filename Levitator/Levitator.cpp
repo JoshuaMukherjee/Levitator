@@ -43,47 +43,6 @@ int Levitator::init_driver() {
 	return 0;
 }
 
-//Levitator::Levitator() {
-//	if (print) { printf("Connecting to board..."); };
-//		numBoards = 2;
-//		boardIDs = (int*)malloc(sizeof(int) * numBoards);
-//		boardIDs[0] = 999;
-//		boardIDs[1] = 1000;
-//
-//		float matBoardToWorldIn[] = {
-//			//top
-//			-1, 0, 0, 0,
-//			0, 1, 0, 0,
-//			0, 0, -1, 0.24f,
-//			0, 0, 0, 1,
-//
-//			1, 0, 0, 0,
-//			0, 1, 0, 0,
-//			0, 0, 1, 0,
-//			0, 0, 0, 1,
-//		};
-//
-//		matBoardToWorld = (float*)malloc(16 * sizeof(float) * numBoards);
-//		memcpy(matBoardToWorld, matBoardToWorldIn, 16 * sizeof(int) * numBoards);
-//		numTransducers = numBoards * 256;
-//	
-//		AsierInho_V2::RegisterPrintFuncs(printV2, printV2, printV2);
-//		AsierInho_V2::AsierInhoBoard_V2* driver = AsierInho_V2::createAsierInho();
-//	
-//		if (!driver->connect(numBoards, boardIDs, matBoardToWorld))
-//			printf("Failed to connect to board.");
-//		//Read parameters to be used for the solver
-//		transducerPositions = new float[numTransducers * 3];
-//		transducerNormals = new float[numTransducers * 3];
-//		amplitudeAdjust = new float[numTransducers];
-//		mappings = new int[numTransducers];
-//		phaseDelays = new int[numTransducers];
-//	
-//		driver->readParameters(transducerPositions, transducerNormals, mappings, phaseDelays, amplitudeAdjust, &numDiscreteLevels);
-//	
-//		if (print) { printf("Connected"); };
-//}
-
 int Levitator::setPhaseAmplitude(float* phases, float* amplitudes, float relative_amp) {
 
 	
