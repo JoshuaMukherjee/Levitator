@@ -20,9 +20,10 @@ class Levitator {
 	int* mappings;
 	int* phaseDelays;
 	int numDiscreteLevels;
+	int num_geometries;
 
-	unsigned char phases_disc[512];
-	unsigned char amplitudes_disc[512];
+	unsigned char* phases_disc;
+	unsigned char* amplitudes_disc;
 
 
 public:
@@ -30,8 +31,7 @@ public:
 	AsierInho::AsierInhoBoard* disc;
 	Levitator( int* boardIDsIn, float* matBoardToWorldIn, int numBoardsIn = 2,bool printIn=true);
 	//Levitator();
-	int setPhaseAmplitude(float* phases, float* amplitudes = NULL, float relative_amp = 1.0);
-	int sendMessage();
+	int sendMessages(float* phases, float* amplitudes, float relative_amp=1, int num_geometriesIn =1, int sleep_ms=0);
 	int TurnOff();
 	int Disconnect();
 	int init_driver();
