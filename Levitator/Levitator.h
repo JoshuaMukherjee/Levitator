@@ -30,7 +30,7 @@ class Levitator {
 public:
 	AsierInho_V2::AsierInhoBoard_V2* driver;
 	AsierInho::AsierInhoBoard* disc;
-	Levitator( int* boardIDsIn, float* matBoardToWorldIn, int numBoardsIn = 2,bool printIn=true , int update_rate_in = 10000);
+	Levitator( int* boardIDsIn, float* matBoardToWorldIn, int numBoardsIn = 2,bool printIn=true , int update_rate_in = 200);
 	//Levitator();
 	int sendMessages(float* phases, float* amplitudes, float relative_amp=1, int num_geometriesIn =1, int sleep_ms=0, bool loop=false);
 	int TurnOff();
