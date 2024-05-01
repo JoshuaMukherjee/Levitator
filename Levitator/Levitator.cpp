@@ -97,7 +97,6 @@ int Levitator::sendNewDivider(unsigned int newDivider) {
 
 int Levitator::sendMessages(float* phases, float* amplitudes, float relative_amp, int num_geometriesIn, int sleep_ms, bool loop) {
 	num_geometries = num_geometriesIn;
-	unsigned char* messages = new unsigned char[2 * num_geometries * numTransducers];
 	unsigned char phases_disc[512], amplitudes_disc[512];
 
 	int numUpdateGeometries = 32;
@@ -105,71 +104,49 @@ int Levitator::sendMessages(float* phases, float* amplitudes, float relative_amp
 		numUpdateGeometries = num_geometries;
 	}
 	
-	
-	//for (int g = 0; g < num_geometries; g++) {
-	//	disc->discretizePhases(&(phases[g * numTransducers]), phases_disc);
-	//	if (amplitudes) {
-	//		disc->discretizeAmplitudes(&(amplitudes[g * numTransducers]), amplitudes_disc);
-	//		disc->correctPhasesShift(phases_disc, amplitudes_disc);
-	//	}
-	//	else {
-	//		unsigned char disc_amp = disc->_discretizeAmplitude(relative_amp);
-	//		memset(amplitudes_disc, disc_amp, numTransducers * sizeof(unsigned char));
-	//	}
-	//	//printf("%p,%p, %p, %p, %p, %p \n", &messages[g * numTransducers + 0], &messages[g * numTransducers + numTransducers / 2], &messages[g * numTransducers + numTransducers * num_geometries], 
-	//	//	&messages[g * numTransducers + numTransducers / 2 + numTransducers * num_geometries], &messages[g * 2 * numTransducers + 0], &messages[g * 2 * numTransducers + numTransducers * num_geometries]);
-	//	memcpy(&messages[g * numTransducers + 0], &phases_disc[0], (numTransducers / 2) * sizeof(unsigned char)); //Bottom phase
-	//	memcpy(&messages[g * numTransducers + numTransducers / 2], &amplitudes_disc[0], (numTransducers / 2) * sizeof(unsigned char)); //Bottom amplitude
-	//	messages[g * 2 * numTransducers + 0] += 128;
-	//	
-	//	memcpy(&messages[g * numTransducers + numTransducers * numUpdateGeometries], &phases_disc[numTransducers / 2], (numTransducers / 2) * sizeof(unsigned char)); //Top phase
-	//	memcpy(&messages[g * numTransducers + numTransducers / 2 + numTransducers * numUpdateGeometries], &amplitudes_disc[numTransducers / 2], (numTransducers / 2) * sizeof(unsigned char));//Top amplitude
-	//	messages[g * numTransducers + numTransducers * numUpdateGeometries] += 128;
-	//}
 
 
-	// See Bk2. Pg 64
+	// See Bk2. Pg 70
 	int number_of_packages = num_geometries / numUpdateGeometries;
 	if (number_of_packages * numUpdateGeometries < num_geometries) {
 		number_of_packages++;
 
 	}
-	printf("%d\n", number_of_packages);
+
+	unsigned char* messages = new unsigned char[2 * numUpdateGeometries * number_of_packages * numTransducers];
 
 	int geometry = 0;
-	for (int p = 0; p < number_of_packages; p++) {
-		int start_id = numUpdateGeometries * numTransducers * 2 * p; 
-		for (int g = 0; g < numUpdateGeometries; g++) {
-			disc->discretizePhases(&(phases[geometry * numTransducers]), phases_disc);
-			if (amplitudes) {
-				disc->discretizeAmplitudes(&(amplitudes[geometry * numTransducers]), amplitudes_disc);
-				disc->correctPhasesShift(phases_disc, amplitudes_disc);
+	for (int p = 0; p < number_of_packages; p++) { //iterate over the packages to send at once
+		for (int g = 0; g < numUpdateGeometries; g++) { //
+			if (geometry < num_geometries) { // a little sloppy but stops it overshooting
+				disc->discretizePhases(&(phases[geometry * numTransducers]), phases_disc);
+				if (amplitudes) {
+					disc->discretizeAmplitudes(&(amplitudes[geometry * numTransducers]), amplitudes_disc);
+					disc->correctPhasesShift(phases_disc, amplitudes_disc);
+				}
+				else {
+					unsigned char disc_amp = disc->_discretizeAmplitude(relative_amp);
+					memset(amplitudes_disc, disc_amp, numTransducers * sizeof(unsigned char));
+				}
+
+				/*printf("%d %d %d %p %p %p %p\n",
+					geometry,
+					p,
+					g,
+					&messages[p * 2 * numUpdateGeometries * numTransducers + numTransducers * g],
+					&messages[p * 2 * numUpdateGeometries * numTransducers + numTransducers * g + (numTransducers / 2)],
+					&messages[p * 2 * numUpdateGeometries * numTransducers + numTransducers * numUpdateGeometries + numTransducers * g],
+					&messages[p * 2 * numUpdateGeometries * numTransducers + numTransducers * numUpdateGeometries + numTransducers * g + (numTransducers / 2)]
+				);*/
+				memcpy(&messages[p * 2 * numUpdateGeometries * numTransducers + numTransducers*g], &phases_disc[0], (numTransducers / 2) * sizeof(unsigned char)); //Bottom phase
+				memcpy(&messages[p * 2 * numUpdateGeometries * numTransducers + numTransducers * g + (numTransducers / 2)], &amplitudes_disc[0], (numTransducers / 2) * sizeof(unsigned char)); //Bottom amplitude
+				messages[p * 2 * numUpdateGeometries * numTransducers + numTransducers * g] += 128;
+				
+				memcpy(&messages[p * 2 * numUpdateGeometries * numTransducers + numTransducers* numUpdateGeometries + numTransducers * g], &phases_disc[numTransducers / 2], (numTransducers / 2) * sizeof(unsigned char)); //Top phase
+				memcpy(&messages[p * 2 * numUpdateGeometries * numTransducers + numTransducers * numUpdateGeometries + numTransducers * g + (numTransducers / 2)], &amplitudes_disc[numTransducers / 2], (numTransducers / 2) * sizeof(unsigned char));//Top amplitude
+				messages[p * 2 * numUpdateGeometries * numTransducers + numTransducers * numUpdateGeometries + numTransducers * g] += 128;
+				geometry++;
 			}
-			else {
-				unsigned char disc_amp = disc->_discretizeAmplitude(relative_amp);
-				memset(amplitudes_disc, disc_amp, numTransducers * sizeof(unsigned char));
-			}
-			
-
-			printf("%p %p %p %p %p %p %p\n",
-				&messages[start_id + numTransducers * g],
-				&messages[start_id + numTransducers * g + numTransducers / 2],
-				&messages[start_id + (numTransducers * numUpdateGeometries) + numTransducers * g],
-				&messages[start_id + (numTransducers * numUpdateGeometries) + numTransducers * g + numTransducers / 2],
-				&messages[start_id + numTransducers * g],
-				&messages[start_id + (numTransducers * numUpdateGeometries) + numTransducers * g],
-				&phases[geometry * numTransducers]);
-
-			memcpy(&messages[start_id + numTransducers*g],						&phases_disc[0],     (numTransducers / 2) * sizeof(unsigned char)); //Bottom phase
-			memcpy(&messages[start_id + numTransducers*g + numTransducers/2],   &amplitudes_disc[0], (numTransducers / 2) * sizeof(unsigned char)); //Bottom amplitude
-			messages[start_id + numTransducers * g] += 128;
-					
-			memcpy(&messages[start_id + (numTransducers* numUpdateGeometries) + numTransducers*g],						 &phases_disc[numTransducers / 2],     (numTransducers / 2) * sizeof(unsigned char)); //Top phase
-			memcpy(&messages[start_id + (numTransducers * numUpdateGeometries) + numTransducers*g + numTransducers/2],   &amplitudes_disc[numTransducers / 2], (numTransducers / 2) * sizeof(unsigned char));//Top amplitude
-			messages[start_id + (numTransducers * numUpdateGeometries) + numTransducers * g] += 128;
-
-			geometry++;
-
 		}
 
 	}
@@ -180,7 +157,6 @@ int Levitator::sendMessages(float* phases, float* amplitudes, float relative_amp
 	for (int i = 0; i < 16; i++) {
 		driver->updateMessage(&messages[0]);
 	}
-
 
 	
 	DWORD waitingPeriod = numUpdateGeometries * (1000000 / update_rate);
