@@ -74,11 +74,9 @@ int Levitator::init_driver() {
 	disc = AsierInho::createAsierInho();
 	if (numBoards > 1) {
 		bool x = disc->connect(AsierInho::BensDesign, boardIDs[0], boardIDs[1]);
-		printf("%d \n", x);
 	}
 	else {
 		bool x = disc->connect(AsierInho::BensDesign, boardIDs[0]);
-		printf("%d", x);
 	}
 	disc->disconnect();
 
