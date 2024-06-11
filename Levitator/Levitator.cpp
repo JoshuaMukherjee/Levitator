@@ -95,6 +95,7 @@ int Levitator::init_driver() {
 }
 
 int Levitator::setFrameRate(int frameRate) {
+	update_rate = frameRate;
 	int div = 40000 / update_rate;
 	this->sendNewDivider(div);
 	return frameRate;
@@ -166,16 +167,17 @@ int Levitator::sendMessages(float* phases, float* amplitudes, float relative_amp
 			}
 
 			int package_index = p * 2 * numUpdateGeometries * 256 * numBoards;
-			memcpy(&messages[package_index + 256 * numBoards * g], &phases_disc[0], (256 * sizeof(unsigned char))); //Bottom phase 
-			memcpy(&messages[package_index + 256 * numBoards * g + 256], &amplitudes_disc[0], (256 * sizeof(unsigned char))); //Bottom amplitude 
-			messages[package_index + (256 * numBoards) * g] += 128;
+			memcpy(&messages[package_index + 256 * 2 * g], &phases_disc[0], (256 * sizeof(unsigned char))); //Bottom phase 
+			memcpy(&messages[package_index + 256 * 2 * g + 256], &amplitudes_disc[0], (256 * sizeof(unsigned char))); //Bottom amplitude 
+			messages[package_index + (256 * 2) * g] += 128;
 
 			if (numBoards > 1) {
-				memcpy(&messages[package_index + (256 * numBoards) * (numGeometriesPerPackage + g)], &phases_disc[256], 256 * sizeof(unsigned char)); //Top phase
-				memcpy(&messages[package_index + (256 * numBoards) * (numGeometriesPerPackage + g) + 256], &amplitudes_disc[256], 256 * sizeof(unsigned char));//Top amplitude
+				memcpy(&messages[package_index + (256 * 2) * (numGeometriesPerPackage + g)], &phases_disc[256], 256 * sizeof(unsigned char)); //Top phase
+				memcpy(&messages[package_index + (256 * 2) * (numGeometriesPerPackage + g) + 256], &amplitudes_disc[256], 256 * sizeof(unsigned char));//Top amplitude
 
-				messages[package_index + (256 * numBoards) * (numGeometriesPerPackage + g)] += 128;
+				messages[package_index + (256 * 2) * (numGeometriesPerPackage + g)] += 128;
 			}
+
 
 			if (p == 0 && g == 0) { // Added by Ryuji
 				memcpy(&initMessage[0], &phases_disc[0], (256 * sizeof(unsigned char))); //Bottom phase 
