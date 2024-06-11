@@ -82,11 +82,11 @@ int Levitator::init_driver() {
 	}
 	disc->disconnect();
 
-	float* trans = this->getTransducerPositions(); //Print Transducers
-	printf("%d\n", this->getNumTransducers());
-	for (int i = 0; i < 3*this->getNumTransducers(); i+=3) {
-		printf("%d, %f, %f, %f \n",i/3, trans[i], trans[i+1], trans[i+2]);
-	}
+	//float* trans = this->getTransducerPositions(); //Print Transducers
+	//printf("%d\n", this->getNumTransducers());
+	//for (int i = 0; i < 3*this->getNumTransducers(); i+=3) {
+	//	printf("%d, %f, %f, %f \n",i/3, trans[i], trans[i+1], trans[i+2]);
+	//}
 
 	int div = 40000 / update_rate;
 	this->sendNewDivider(div);
