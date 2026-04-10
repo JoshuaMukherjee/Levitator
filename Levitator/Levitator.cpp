@@ -208,9 +208,9 @@ int Levitator::sendMessages(float* phases, float* amplitudes, float relative_amp
 	while (loop || !in_loop) {
 		for (int g = 0; g < num_geometries; g += numUpdateGeometries) {
 			// wait a while 
-			do {
+			/*do {
 				currentTime = microTimer::uGetTime();
-			} while (currentTime - lastUpdate < waitingPeriod);
+			} while (currentTime - lastUpdate < waitingPeriod);*/
 			// send messages to the boards
 			int numMessagesToSend = min(numUpdateGeometries, num_geometries - g);
 			driver->updateMessages(&messages[2 * g * numTransducers], numMessagesToSend);
@@ -223,7 +223,7 @@ int Levitator::sendMessages(float* phases, float* amplitudes, float relative_amp
 		if (l > 0 && l >= num_loops) { loop = false; }
 	}
 	DWORD end = microTimer::uGetTime();
-	if (print) { printf("Estimated frame rate is %f Hz\n", num_geometries * 1000000.f / (end - start)); }
+	if (print) { printf("Estimated frame rate is %f Hz\n", l*num_geometries * 1000000.f / (end - start)); }
 
 	return 0;
 }
